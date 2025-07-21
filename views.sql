@@ -123,4 +123,72 @@ JOIN
 SELECT *
 FROM view_chamados
 -- WHERE data_abertura BETWEEN '2025-01-01' AND '2025-07-01';
+--Relatório chamados encerrados por tipo de serviço
+SELECT
+    vc.tipo_servico AS tipo_de_servico,
+    COUNT(vc.chamado_id) AS total_chamados,
+    COUNT(CASE WHEN vc.data_encerramento IS NOT NULL THEN 1 END) AS chamados_encerrados,
+    AVG(DATEDIFF(SECOND, vc.data_abertura, vc.data_encerramento)) / 60.0 AS tempo_medio_solucao_minutos
+FROM
+    view_chamados vc
+GROUP BY
+    vc.tipo_servico
+ORDER BY
+    total_chamados DESC;
+-- Relatório de todos os chamados agrupados por tipo de serviço
+CREATE VIEW view_chamados_por_tipo_servico AS
+SELECT
+    tipo_servico_id,
+    tipo_servico,
+    COUNT(chamado_id) AS total_chamados
+FROM
+    view_chamados
+GROUP BY
+    tipo_servico_id,
+    tipo_servico;
 
+-- Relatório de técnicos por departamento
+SELECT
+    d.departamento_id,
+    d.nome AS nome_departamento,
+
+    t.tecnico_id,
+    t.nome_usuario AS nome_tecnico,
+    t.nome_cargo,
+    t.nome_area_atuacao
+
+FROM
+    view_tecnicos t
+JOIN
+    view_departamentos d ON t.departamento_id = d.departamento_id
+ORDER BY
+    d.nome, t.nome_usuario;
+-- Relatório de chamados por solicitante
+
+SELECT
+    s.solicitante_id,
+    s.nome_usuario AS nome_solicitante,
+    s.email,
+    s.telefone,
+    s.nome_empresa,
+    s.cnpj,
+
+    COUNT(c.chamado_id) AS total_chamados,
+    COUNT(CASE WHEN c.data_encerramento IS NOT NULL THEN 1 END) AS chamados_encerrados,
+    COUNT(CASE WHEN c.data_encerramento IS NULL THEN 1 END) AS chamados_abertos
+
+FROM
+    view_chamados c
+JOIN
+    view_solicitantes s ON c.solicitante_id = s.solicitante_id
+
+GROUP BY
+    s.solicitante_id,
+    s.nome_usuario,
+    s.email,
+    s.telefone,
+    s.nome_empresa,
+    s.cnpj
+
+ORDER BY
+    total_chamados DESC;
