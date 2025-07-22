@@ -55,4 +55,24 @@ END$$
 
 DELIMITER ;
 
+DELIMITER $$
+
+CREATE TRIGGER set_sla_automatica
+BEFORE INSERT ON Chamado
+FOR EACH ROW
+BEGIN
+    IF NEW.sla_id IS NULL THEN
+        -- Supondo que cada tipo de serviço tem um SLA padrão
+        SET NEW.sla_id = (
+            SELECT MIN(sla_id)
+            FROM SLA
+            WHERE tempo_resposta <= 60 AND tempo_solucao <= 240
+            LIMIT 1
+        );
+    END IF;
+END$$
+
+DELIMITER ;
+
+
 

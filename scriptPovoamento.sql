@@ -57,6 +57,9 @@ INSERT INTO PermissaoUsuario (usuario_id, descricao, nivel_acesso) VALUES (1, 'A
 
 -- Solicitante e Técnico
 INSERT INTO Solicitante (usuario_id, empresa_id) VALUES (1, 1);
+INSERT INTO Solicitante (usuario_id, empresa_id) VALUES (2, 2);
+INSERT INTO Solicitante (usuario_id, empresa_id) VALUES (3, 3);
+
 
 INSERT INTO Cargo (nome, descricao) VALUES ('Analista', 'Responsável por suporte');
 INSERT INTO Departamento (nome, descricao) VALUES ('TI', 'Tecnologia da Informação');
@@ -70,6 +73,9 @@ INSERT INTO TipoServico (nome) VALUES ('Manutenção');
 INSERT INTO SubtipoServico (tipo_servico_id, nome) VALUES (1, 'Reparo de impressora');
 
 INSERT INTO SLA (tempo_resposta, tempo_solucao) VALUES (60, 240);
+INSERT INTO SLA (tempo_resposta, tempo_solucao) VALUES (30, 120); -- Este pode ter ID 2
+INSERT INTO SLA (tempo_resposta, tempo_solucao) VALUES (120, 480); -- Este pode ter ID 3
+
 INSERT INTO StatusChamado (descricao) VALUES ('Aberto'),('Em espera'),('Em andamento'),('Fechado');
 
 -- Chamado
@@ -86,6 +92,8 @@ VALUES ('Impressora não funciona', 'A impressora do setor está com erro.', CUR
 ('Instalação de software', 'Solicitação para instalar antivírus.', CURDATE(), 3, 1, 1, 1, 1, 1),
 ('Atualização de sistema', 'Solicitação de update do Windows.', CURDATE(), 2, 1, 1, 1, 1, 1),
 ('Problema com teclado', 'Teclado com falhas nas teclas.', CURDATE(), 1, 1, 1, 1, 1, 1);  
+
+
 
 -- Feedback
 INSERT INTO Feedback (nota, comentario, data_feedback, chamado_id) VALUES ( 10, 'Ótimo atendimento!', '2025-06-24', 3),( 7, 'Atendente demorou a responder', '2025-06-25', 1),(9, 'Rápido e eficiente', '2025-06-26', 2),

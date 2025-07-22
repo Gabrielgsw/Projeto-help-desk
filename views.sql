@@ -121,14 +121,16 @@ JOIN
 -- Relatórios
 
 SELECT *
-FROM view_chamados
+FROM view_chamados;
 -- WHERE data_abertura BETWEEN '2025-01-01' AND '2025-07-01';
---Relatório chamados encerrados por tipo de serviço
+-- Relatório chamados encerrados por tipo de serviço;
+
+SELECT sla_id, tempo_resposta, tempo_solucao FROM SLA;
+
 SELECT
     vc.tipo_servico AS tipo_de_servico,
     COUNT(vc.chamado_id) AS total_chamados,
-    COUNT(CASE WHEN vc.data_encerramento IS NOT NULL THEN 1 END) AS chamados_encerrados,
-    AVG(DATEDIFF(SECOND, vc.data_abertura, vc.data_encerramento)) / 60.0 AS tempo_medio_solucao_minutos
+    COUNT(CASE WHEN vc.data_encerramento IS NOT NULL THEN 1 END) AS chamados_encerrados
 FROM
     view_chamados vc
 GROUP BY
@@ -192,3 +194,27 @@ GROUP BY
 
 ORDER BY
     total_chamados DESC;
+    
+    SELECT
+    c.chamado_id,
+    c.titulo,
+    c.descricao,
+    c.data_abertura,
+    c.data_encerramento,
+    sc.descricao AS status_chamado,
+    u_sol.nome AS solicitante,
+    u_tec.nome AS tecnico
+FROM
+    Chamado c
+JOIN
+    StatusChamado sc ON c.status_id = sc.status_id
+JOIN
+    Solicitante s ON c.solicitante_id = s.solicitante_id
+JOIN
+    Usuario u_sol ON s.usuario_id = u_sol.usuario_id
+LEFT JOIN -- LEFT JOIN caso um técnico não esteja atribuído ou o ID seja inválido
+    Tecnico t ON c.tecnico_id = t.tecnico_id
+LEFT JOIN
+    Usuario u_tec ON t.usuario_id = u_tec.usuario_id
+WHERE
+    sc.descricao = 'Fechado';

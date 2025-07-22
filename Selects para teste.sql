@@ -2,20 +2,28 @@
 
 -- Registrar um chamado:
 INSERT INTO Chamado (titulo, descricao, data_abertura, status_id, sla_id, tipo_servico_id, subtipo_id, solicitante_id, tecnico_id)
-VALUES ('Sistema lento1111', 'Meu sistema está lento quando tento abrir o aplicativo da empresa. 2222', CURDATE(), 1, 1, 1, 1, 1, NULL);
+VALUES ('Sistema com erro', 'Meu sistema está com erro quando tento abrir o aplicativo da empresa.', CURDATE(), 1, 1, 1, 1, 1, NULL);
 
-SELECT * FROM Chamado;
 
 -- Enviar um comentário:
 INSERT INTO Comentario (chamado_id, usuario_id, conteudo, data_comentario)
-VALUES (1, 1, 'Primeiro comentário do João como cliente.', NOW());
+VALUES (5, 1, 'Primeiro comentário do João como cliente.', NOW());
 
 -- Dar Feedback para um chamado
 INSERT INTO Feedback (chamado_id, nota, comentario, data_feedback)
 VALUES (1, 9, 'Gostei do atendimento.', NOW());
 
+
+SELECT * FROM Chamado;
+
+SELECT chamado_id, titulo, sla_id 
+FROM Chamado
+ORDER BY chamado_id DESC
+LIMIT 5;
+
+
 -- Consultar os dados
-SELECT * FROM Usuario WHERE usuario_id = 1;
+SELECT * FROM Usuario WHERE usuario_id = 3;
 
 -- Consultar a base de conhecimento
 SELECT * FROM BaseConhecimento;
