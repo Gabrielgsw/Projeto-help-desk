@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS CHAMADO (
     Prioridade VARCHAR(50),
     Complexidade VARCHAR(50),
     descricao TEXT,
-    status VARCHAR(50),
+    status VARCHAR(50), -- 'Pendente', 'Em demanda', 'Resolvido'
     tipo VARCHAR(50),
     cod_plano VARCHAR(50), -- Assumindo que cod_plano seja um código externo ou não referenciado aqui
     mat_supervisor INT,
