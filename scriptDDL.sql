@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS FATURA (
     n_parcelas INT,
     data_emissao DATE,
     valor_total DECIMAL(10,2),
-    status VARCHAR(50),
+    status VARCHAR(50), -- -- 'Aberta', 'Paga', 'Atrasada'
     cod_cliente_pj INT,    
     FOREIGN KEY (cod_cliente_pj) REFERENCES CLIENTE_PJ (Cod)
 );
