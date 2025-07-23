@@ -85,3 +85,39 @@ BEGIN
 END //
 
 DELIMITER ;
+
+DELIMITER //
+
+ 
+-- DROP FUNCTION IF EXISTS verificar_pagamentos_em_dia; 
+-- Verifica se o cliente possui alguma parcela de alguma fatura atrasada, retorna true caso esteja inadimplente
+CREATE FUNCTION verificar_pagamentos_em_dia(p_cod_cliente INT)
+RETURNS BOOLEAN
+READS SQL DATA
+DETERMINISTIC 
+
+BEGIN
+    DECLARE cliente_em_dia BOOLEAN DEFAULT TRUE;
+    DECLARE data_atual DATE;
+    
+    SET data_atual = CURDATE(); 
+
+    -- Verifica se existe pelo menos uma parcela vencida e não paga para o cliente
+    SELECT TRUE INTO cliente_em_dia
+    FROM CLIENTE_PJ AS CPJ
+    JOIN FATURA AS F ON CPJ.Cod = F.cod_cliente_pj
+    JOIN PARCELA_FATURA AS PF ON F.cod = PF.cod_fatura
+    WHERE CPJ.Cod = p_cod_cliente
+      AND PF.data_vencimento < data_atual 
+      AND PF.status_parcela != 'Paga' -- Filtra as parcelas vencidas e não pagas
+    LIMIT 1; 
+   
+    IF cliente_em_dia = TRUE THEN        
+        RETURN FALSE; -- Retorna false caso tenha encontrado alguma parcela não paga e com data de vencimento menor que hoje
+    ELSE        
+        RETURN TRUE; -- Caso contrário, não há pendências
+    END IF;
+
+END //
+
+DELIMITER ;
