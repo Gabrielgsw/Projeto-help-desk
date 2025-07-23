@@ -42,7 +42,7 @@ BEGIN
     DECLARE fatura_cod INT;
     DECLARE fatura_data_emissao DATE;
 
-    -- 1. Obter o status e a data de 'conclusão' (dt_devida) da Ordem de Serviço
+    -- Obter o status e a data de 'conclusão' (dt_devida) da Ordem de Serviço
     SELECT
         OS.status,
         OS.dt_devida, -- Usando dt_devida como a data de referência para conclusão da OS
