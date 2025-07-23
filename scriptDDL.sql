@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS ORCAMENTO (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS ORDEM_SERVICO (
     numero INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    status VARCHAR(50),
+    status VARCHAR(50), -- Esse status deve ser atualizado conforme atualização no status do chamado
     data_criacao DATE,
     prazo_em_dias INT,
     dt_devida DATE,
