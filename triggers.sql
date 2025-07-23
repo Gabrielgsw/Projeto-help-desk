@@ -1,78 +1,45 @@
-USE help_desk;
-DELIMITER $$
+USE HelpDesk;
 
-CREATE TRIGGER trigger_atribuir_chamado -- atribuir um chamado a um técnico existente
-BEFORE INSERT ON Chamado
+DELIMITER //
+
+
+CREATE TRIGGER trigger_updt_tecnicos -- Atualização de técnicos
+AFTER INSERT ON TECNICO
 FOR EACH ROW
 BEGIN
-    DECLARE id_tecnico INT;
-    
-    SELECT tecnico_id INTO id_tecnico
-    FROM Tecnico
-    WHERE usuario_id = 2 LIMIT 1; 
-        
-    IF NEW.tecnico_id IS NULL THEN
-        SET NEW.tecnico_id = id_tecnico;
-    END IF;
-END$$
-
-DELIMITER ;
+    UPDATE UNIDADE_SUPORTE
+    SET NroFuncionarios = COALESCE(NroFuncionarios, 0) + 1 -- incrementa numero de funcionarios
+    WHERE CNPJ = NEW.unidade;
+END //
 
 
-DELIMITER $$
-
-CREATE TRIGGER trigger_historico_chamado -- adicionar um chamado ao histórico de chamados
-AFTER INSERT ON Chamado
+CREATE TRIGGER trigger_del_tecnicos -- Deletar técnicos
+AFTER DELETE ON TECNICO
 FOR EACH ROW
 BEGIN
-    INSERT INTO Historico (chamado_id, descricao, data_alteracao)
-    VALUES (
-        NEW.chamado_id,
-        CONCAT('Chamado adicionado: "', NEW.titulo, '"'),
-        NOW()
-    );
-END$$
+    UPDATE UNIDADE_SUPORTE
+    SET NroFuncionarios = COALESCE(NroFuncionarios, 0) - 1 -- decrementa funcionários
+    WHERE CNPJ = OLD.unidade;
+END //
 
-DELIMITER ;
 
-DELIMITER $$
-
-CREATE TRIGGER trigger_atualizar_numero_funcionarios
-AFTER INSERT ON Departamento
+CREATE TRIGGER trigger_updt_supervisores -- Atualizar supervisores
+AFTER INSERT ON SUPERVISOR
 FOR EACH ROW
 BEGIN
-    DECLARE num_funcionarios INT;
-
-    SELECT COUNT(*) INTO num_funcionarios
-    FROM Usuario
-    WHERE departamento_id = NEW.departamento_id;
-
-    UPDATE Departamento
-    SET numero_funcionarios = num_funcionarios
-    WHERE departamento_id = NEW.departamento_id;
-END$$
+    UPDATE UNIDADE_SUPORTE
+    SET NroFuncionarios = COALESCE(NroFuncionarios, 0) + 1
+    WHERE CNPJ = NEW.unidade;
+END //
 
 
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE TRIGGER set_sla_automatica
-BEFORE INSERT ON Chamado
+CREATE TRIGGER trigger_del_supervisores -- Deletar supervisores
+AFTER DELETE ON SUPERVISOR
 FOR EACH ROW
 BEGIN
-    IF NEW.sla_id IS NULL THEN
-        -- Supondo que cada tipo de serviço tem um SLA padrão
-        SET NEW.sla_id = (
-            SELECT MIN(sla_id)
-            FROM SLA
-            WHERE tempo_resposta <= 60 AND tempo_solucao <= 240
-            LIMIT 1
-        );
-    END IF;
-END$$
+    UPDATE UNIDADE_SUPORTE
+    SET NroFuncionarios = COALESCE(NroFuncionarios, 0) - 1
+    WHERE CNPJ = OLD.unidade;
+END //
 
 DELIMITER ;
-
-
-
