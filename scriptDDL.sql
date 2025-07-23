@@ -95,6 +95,22 @@ CREATE TABLE IF NOT EXISTS FATURA (
 );
 
 -- -----------------------------------------------------
+-- Table PARCELA_FATURA
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS PARCELA_FATURA ( -- Entidade criada para armazenar as parcelas de uma fatura
+    parcela_id INT NOT NULL AUTO_INCREMENT,
+    cod_fatura INT NOT NULL,
+    numero_parcela INT NOT NULL,
+    valor_parcela DECIMAL(10,2),
+    data_vencimento DATE NOT NULL,
+    data_pagamento DATE, -- NULL se ainda não foi paga
+    status_parcela VARCHAR(50) NOT NULL DEFAULT 'Aberta', -- 'Aberta', 'Paga', 'Vencida', 'Atrasada'
+    PRIMARY KEY (parcela_id),
+    UNIQUE (cod_fatura, numero_parcela), -- Garante unicidade de parcela por fatura
+    FOREIGN KEY (cod_fatura) REFERENCES FATURA (cod)
+);
+
+-- -----------------------------------------------------
 -- Table CHAMADO
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS CHAMADO (
