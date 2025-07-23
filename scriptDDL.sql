@@ -1,201 +1,291 @@
-USE help_desk;
+CREATE DATABASE HelpDesk;
+USE HelpDesk;
 
-CREATE TABLE Estado (
-    estado_id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(50),
-    sigla CHAR(2)
+-- Desabilita a verificação de chaves estrangeiras temporariamente.
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- -----------------------------------------------------
+-- Table UNIDADE_SUPORTE
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS UNIDADE_SUPORTE (
+    CNPJ VARCHAR(18) NOT NULL PRIMARY KEY,
+    estado VARCHAR(50),
+    endereco VARCHAR(255),
+    nome VARCHAR(255) NOT NULL,
+    Matriz BOOLEAN DEFAULT FALSE,
+    razao_social VARCHAR(255) NOT NULL,
+    NroFuncionarios INT DEFAULT 0 -- iniciando sem funcionarios
 );
 
-CREATE TABLE Cidade (
-    cidade_id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(50),
-    estado_id INT,
-    FOREIGN KEY (estado_id) REFERENCES Estado(estado_id)
+-- -----------------------------------------------------
+-- Table CLIENTE_PJ
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS CLIENTE_PJ (
+    cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    prioridade VARCHAR(50),
+    endereco VARCHAR(255),
+    estado VARCHAR(50),
+    fone VARCHAR(20),
+    email VARCHAR(255),
+    cnpj VARCHAR(18) UNIQUE,
+    razao_social VARCHAR(255)  
 );
 
-CREATE TABLE Bairro (
-    bairro_id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(50),
-    cidade_id INT,
-    FOREIGN KEY (cidade_id) REFERENCES Cidade(cidade_id)
+-- -----------------------------------------------------
+-- Table SUPERVISOR
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS SUPERVISOR (
+    Matricula INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    login VARCHAR(50) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    nome VARCHAR(255) NOT NULL,
+    CPF VARCHAR(14) UNIQUE,
+    email VARCHAR(255) UNIQUE,
+    carga_horaria INT,
+    unidade VARCHAR(18),    
+    FOREIGN KEY (unidade) REFERENCES UNIDADE_SUPORTE (CNPJ)
 );
 
-CREATE TABLE Logradouro (
-    logradouro_id INT PRIMARY KEY AUTO_INCREMENT,
-    rua VARCHAR(100),
-    numero VARCHAR(10),
-    bairro_id INT,
-    FOREIGN KEY (bairro_id) REFERENCES Bairro(bairro_id)
+-- -----------------------------------------------------
+-- Table TECNICO
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS TECNICO (
+    Matricula INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    login VARCHAR(50) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    nome VARCHAR(255) NOT NULL,
+    CPF VARCHAR(14) UNIQUE,
+    email VARCHAR(255) UNIQUE,
+    carga_horaria INT,
+    no_consertos INT DEFAULT 0,
+    dias_trabalhados INT DEFAULT 0,
+    no_voltas INT DEFAULT 0,
+    matric_supervisor INT,
+    data_inicio DATE,
+    unidade VARCHAR(18),    
+    FOREIGN KEY (matric_supervisor) REFERENCES SUPERVISOR (Matricula),
+    FOREIGN KEY (unidade) REFERENCES UNIDADE_SUPORTE (CNPJ)
 );
 
-CREATE TABLE EmpresaSolicitante (
-    empresa_id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100),
-    cnpj CHAR(20),
-    logradouro_id INT,
-    FOREIGN KEY (logradouro_id) REFERENCES Logradouro(logradouro_id)
+-- -----------------------------------------------------
+-- Table KPI
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS KPI (
+    matric_tec INT NOT NULL,
+    Sequencial INT NOT NULL,
+    KPI_1 VARCHAR(100),
+    dsc_KPI_1 VARCHAR(255),
+    KPI_2 VARCHAR(100),
+    dsc_KPI_2 VARCHAR(255),
+    PRIMARY KEY (matric_tec, Sequencial),
+    FOREIGN KEY (matric_tec) REFERENCES TECNICO (Matricula)
 );
 
-CREATE TABLE Usuario (
-    usuario_id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100),
-    email VARCHAR(100),
-    senha VARCHAR(100),
-    telefone VARCHAR(15),
-    data_cadastro DATE
+-- -----------------------------------------------------
+-- Table FATURA
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS FATURA (
+    cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    n_parcelas INT,
+    valor_total DECIMAL(10,2),
+    status VARCHAR(50),
+    cod_cliente_pj INT,    
+    FOREIGN KEY (cod_cliente_pj) REFERENCES CLIENTE_PJ (Cod)
 );
 
-CREATE TABLE PermissaoUsuario (
-    permissao_id INT PRIMARY KEY AUTO_INCREMENT,
-    usuario_id INT,
-    descricao VARCHAR(50),
-    nivel_acesso INT,
-    FOREIGN KEY (usuario_id) REFERENCES Usuario(usuario_id)
-);
-
-CREATE TABLE Solicitante (
-    solicitante_id INT PRIMARY KEY AUTO_INCREMENT,
-    usuario_id INT,
-    empresa_id INT,
-    FOREIGN KEY (usuario_id) REFERENCES Usuario(usuario_id),
-    FOREIGN KEY (empresa_id) REFERENCES EmpresaSolicitante(empresa_id)
-);
-
-CREATE TABLE Cargo (
-    cargo_id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(50),
-    descricao TEXT
-);
-
-CREATE TABLE Departamento (
-    departamento_id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(50),
-    descricao TEXT
-);
-
-CREATE TABLE AreaAtuacao (
-    area_atuacao_id INT PRIMARY KEY AUTO_INCREMENT,
-    descricao TEXT
-);
-
-CREATE TABLE Tecnico (
-    tecnico_id INT PRIMARY KEY AUTO_INCREMENT,
-    usuario_id INT,
-    cargo_id INT,
-    departamento_id INT,
-    area_atuacao_id INT,
-    FOREIGN KEY (usuario_id) REFERENCES Usuario(usuario_id),
-    FOREIGN KEY (cargo_id) REFERENCES Cargo(cargo_id),
-    FOREIGN KEY (departamento_id) REFERENCES Departamento(departamento_id),
-    FOREIGN KEY (area_atuacao_id) REFERENCES AreaAtuacao(area_atuacao_id)
-);
-
-CREATE TABLE TipoServico (
-    tipo_servico_id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100)
-);
-
-CREATE TABLE SubtipoServico (
-    subtipo_id INT PRIMARY KEY AUTO_INCREMENT,
-    tipo_servico_id INT,
-    nome VARCHAR(100),
-    FOREIGN KEY (tipo_servico_id) REFERENCES TipoServico(tipo_servico_id)
-);
-
-CREATE TABLE SLA (
-    sla_id INT PRIMARY KEY AUTO_INCREMENT,
-    tempo_resposta INT,
-    tempo_solucao INT
-);
-
-CREATE TABLE StatusChamado (
-    status_id INT PRIMARY KEY AUTO_INCREMENT,
-    descricao VARCHAR(50)
-);
-
-CREATE TABLE Chamado (
-    chamado_id INT PRIMARY KEY AUTO_INCREMENT,
-    titulo VARCHAR(100),
+-- -----------------------------------------------------
+-- Table CHAMADO
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS CHAMADO (
+    Seq INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Prioridade VARCHAR(50),
+    Complexidade VARCHAR(50),
     descricao TEXT,
+    status VARCHAR(50),
+    tipo VARCHAR(50),
+    cod_plano VARCHAR(50), -- Assumindo que cod_plano seja um código externo ou não referenciado aqui
+    mat_supervisor INT,
+    mat_tec INT,
+    cod_cliente_pj INT,
+    data DATE,    
+    FOREIGN KEY (mat_supervisor) REFERENCES SUPERVISOR (Matricula),
+    FOREIGN KEY (mat_tec) REFERENCES TECNICO (Matricula),
+    FOREIGN KEY (cod_cliente_pj) REFERENCES CLIENTE_PJ (Cod)
+);
+
+-- -----------------------------------------------------
+-- Table ORCAMENTO
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS ORCAMENTO (
+    cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     data_abertura DATE,
-    data_encerramento DATE,
-    status_id INT,
-    sla_id INT,
-    tipo_servico_id INT,
-    subtipo_id INT,
-    solicitante_id INT,
-    tecnico_id INT,
-    FOREIGN KEY (status_id) REFERENCES StatusChamado(status_id),
-    FOREIGN KEY (sla_id) REFERENCES SLA(sla_id),
-    FOREIGN KEY (tipo_servico_id) REFERENCES TipoServico(tipo_servico_id),
-    FOREIGN KEY (subtipo_id) REFERENCES SubtipoServico(subtipo_id),
-    FOREIGN KEY (solicitante_id) REFERENCES Solicitante(solicitante_id),
-    FOREIGN KEY (tecnico_id) REFERENCES Tecnico(tecnico_id)
-);
-
-CREATE TABLE Comentario (
-    comentario_id INT PRIMARY KEY AUTO_INCREMENT,
-    chamado_id INT,
-    usuario_id INT,
-    conteudo TEXT,
-    data_comentario DATETIME,
-    FOREIGN KEY (chamado_id) REFERENCES Chamado(chamado_id),
-    FOREIGN KEY (usuario_id) REFERENCES Usuario(usuario_id)
-);
-
-CREATE TABLE Feedback (
-    feedback_id INT PRIMARY KEY AUTO_INCREMENT,
-    chamado_id INT,
-    nota INT CHECK (nota BETWEEN 0 AND 10),
-    comentario TEXT,
-    data_feedback DATETIME,
-    FOREIGN KEY (chamado_id) REFERENCES Chamado(chamado_id)
-);
-
-CREATE TABLE Historico (
-    historico_id INT PRIMARY KEY AUTO_INCREMENT,
-    chamado_id INT,
+    dt_emissao DATE,
     descricao TEXT,
-    data_alteracao DATETIME,
-    FOREIGN KEY (chamado_id) REFERENCES Chamado(chamado_id)
+    validade_n_dias INT,
+    ultima_data DATE    
 );
 
-CREATE TABLE Auditoria (
-    auditoria_id INT PRIMARY KEY AUTO_INCREMENT,
-    chamado_id INT,
-    usuario_id INT,
-    acao TEXT,
-    data_acao DATETIME,
-    FOREIGN KEY (chamado_id) REFERENCES Chamado(chamado_id),
-    FOREIGN KEY (usuario_id) REFERENCES Usuario(usuario_id)
+-- -----------------------------------------------------
+-- Table ORDEM_SERVICO
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS ORDEM_SERVICO (
+    numero INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    status VARCHAR(50),
+    data_criacao DATE,
+    prazo_em_dias INT,
+    dt_devida DATE,
+    cod_orcamento INT,
+    cod_fatura INT,
+    cod_chamado INT,    
+    FOREIGN KEY (cod_orcamento) REFERENCES ORCAMENTO (cod),
+    FOREIGN KEY (cod_fatura) REFERENCES FATURA (cod),
+    FOREIGN KEY (cod_chamado) REFERENCES CHAMADO (Seq)
 );
 
-CREATE TABLE LogAtividades (
-    log_id INT PRIMARY KEY AUTO_INCREMENT,
-    auditoria_id INT,
+-- -----------------------------------------------------
+-- Table TIPO_SERVICO
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS TIPO_SERVICO (
+    cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    descricao VARCHAR(255)    
+);
+
+-- -----------------------------------------------------
+-- Table SERVICO
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS SERVICO (
+    cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     descricao TEXT,
-    data DATETIME,
-    FOREIGN KEY (auditoria_id) REFERENCES Auditoria(auditoria_id)
+    status VARCHAR(50),
+    valor DECIMAL(10,2),
+    cod_tipo_servico INT,
+    num_serv INT, 
+    nivel_urgencia VARCHAR(50),   
+    FOREIGN KEY (cod_tipo_servico) REFERENCES TIPO_SERVICO (cod),
+    FOREIGN KEY (num_serv) REFERENCES ORDEM_SERVICO (numero)
 );
 
-CREATE TABLE TempoAtividade (
-    tempo_id INT PRIMARY KEY AUTO_INCREMENT,
-    log_id INT,
-    tempo_gasto INT,
-    FOREIGN KEY (log_id) REFERENCES LogAtividades(log_id)
+-- -----------------------------------------------------
+-- Table CONTRATO
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS CONTRATO (
+    cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    dt_fim DATE,
+    status VARCHAR(50),
+    dt_inicio DATE,
+    periodo_contrato_em_dias INT,
+    cod_cliente_pj INT NOT NULL,
+    cod_unidade VARCHAR(18) NOT NULL,        
+    UNIQUE (cod_cliente_pj, cod_unidade),
+    FOREIGN KEY (cod_cliente_pj) REFERENCES CLIENTE_PJ (Cod),
+    FOREIGN KEY (cod_unidade) REFERENCES UNIDADE_SUPORTE (CNPJ)
 );
 
-CREATE TABLE BaseConhecimento (
-    base_id INT PRIMARY KEY AUTO_INCREMENT,
-    titulo VARCHAR(100),
-    conteudo TEXT,
-    tecnico_id INT,
-    FOREIGN KEY (tecnico_id) REFERENCES Tecnico(tecnico_id)
+-- -----------------------------------------------------
+-- Table COMPUTADOR
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS COMPUTADOR (
+    cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    estado VARCHAR(50),
+    fabricante VARCHAR(255),
+    data_entrada DATE,
+    setor VARCHAR(255),
+    descricao TEXT,
+    historico TEXT,
+    bios_fabric VARCHAR(255),
+    versao_bios VARCHAR(50),
+    nome_so VARCHAR(255),
+    versao_so VARCHAR(50),
+    end_IP VARCHAR(15),
+    tipo VARCHAR(50),
+    cod_contrato INT,    
+    FOREIGN KEY (cod_contrato) REFERENCES CONTRATO (cod)
 );
 
-CREATE TABLE PalavraChave (
-    palavra_id INT PRIMARY KEY AUTO_INCREMENT,
-    base_id INT,
-    palavra VARCHAR(100),
-    FOREIGN KEY (base_id) REFERENCES BaseConhecimento(base_id)
+-- -----------------------------------------------------
+-- Table IMPRESSORA
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS IMPRESSORA (
+    cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    estado VARCHAR(50),
+    fabricante VARCHAR(255),
+    data_entrada DATE,
+    setor VARCHAR(255),
+    descricao TEXT,
+    historico TEXT,
+    modelo VARCHAR(255),
+    cod_contrato INT,   
+	FOREIGN KEY (cod_contrato) REFERENCES CONTRATO (cod)
 );
+
+-- -----------------------------------------------------
+-- Table DRIVER_IMPRESSORA
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS DRIVER_IMPRESSORA (
+    cod_impressora INT NOT NULL,
+    cod_driver INT NOT NULL,
+    Versao VARCHAR(50),
+    Caminho VARCHAR(255),
+    PRIMARY KEY (cod_impressora, cod_driver),
+    FOREIGN KEY (cod_impressora) REFERENCES IMPRESSORA (cod)
+);
+
+-- -----------------------------------------------------
+-- Table COMPONENTE
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS COMPONENTE (
+    cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    onboard BOOLEAN,
+    tipo VARCHAR(50),
+    modelo VARCHAR(255),
+    fabricante VARCHAR(255)   
+);
+
+-- -----------------------------------------------------
+-- Table DRIVER (do COMPONENTE)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS DRIVER (
+    cod_componente INT NOT NULL,
+    Sequencial INT NOT NULL,
+    Caminho VARCHAR(255),
+    PRIMARY KEY (cod_componente, Sequencial),
+    FOREIGN KEY (cod_componente) REFERENCES COMPONENTE (cod)
+);
+
+-- -----------------------------------------------------
+-- Relacionamento N:N entre COMPUTADOR e COMPONENTE
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Possui_computador_componente (
+    cod_comp INT NOT NULL,
+    cod_componente INT NOT NULL,
+    PRIMARY KEY (cod_comp, cod_componente),
+    FOREIGN KEY (cod_comp) REFERENCES COMPUTADOR (cod),
+    FOREIGN KEY (cod_componente) REFERENCES COMPONENTE (cod)
+);
+
+-- -----------------------------------------------------
+-- Relacionamento N:N entre COMPUTADOR e ORDEM_SERVICO
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Envolveu_Ordem_Servico_Computador (
+    cod_comp INT NOT NULL,
+    cod_num_ordem INT NOT NULL, -- O nome do campo na ORDEM_SERVICO é 'numero'
+    PRIMARY KEY (cod_comp, cod_num_ordem),
+    FOREIGN KEY (cod_comp) REFERENCES COMPUTADOR (cod),
+    FOREIGN KEY (cod_num_ordem) REFERENCES ORDEM_SERVICO (numero)
+);
+
+-- -----------------------------------------------------
+-- Relacionamento N:N entre IMPRESSORA e ORDEM_SERVICO
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Envolveu_Ordem_Servico_Impressora (
+    cod_impressora INT NOT NULL,
+    cod_num_ordem INT NOT NULL, -- O nome do campo na ORDEM_SERVICO é 'numero'
+    PRIMARY KEY (cod_impressora, cod_num_ordem),
+    FOREIGN KEY (cod_impressora) REFERENCES IMPRESSORA (cod),
+    FOREIGN KEY (cod_num_ordem) REFERENCES ORDEM_SERVICO (numero)
+);
+
+-- Reabilita a verificação de chaves estrangeiras.
+SET FOREIGN_KEY_CHECKS = 1;
+
+
