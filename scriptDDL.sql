@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS KPI (
 CREATE TABLE IF NOT EXISTS FATURA (
     cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     n_parcelas INT,
+    data_emissao DATE,
     valor_total DECIMAL(10,2),
     status VARCHAR(50),
     cod_cliente_pj INT,    
