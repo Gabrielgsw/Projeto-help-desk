@@ -43,10 +43,23 @@ INSERT INTO TECNICO (Matricula, login, senha, nome, CPF, email, carga_horaria, n
 -- -----------------------------------------------------
 INSERT INTO KPI (matric_tec, Sequencial, KPI_1, dsc_KPI_1, KPI_2, dsc_KPI_2) VALUES
 (101, 1, 'Tempo Médio de Resposta', 'Média de tempo para primeira resposta', 'Taxa de Resolução', 'Porcentagem de chamados resolvidos'),
-(102, 1, 'Satisfação do Cliente', 'Pesquisa de nível de satisfação pós-atendimento', 'Tempo Médio de Atendimento', 'Média de tempo para fechar um chamado'),
-(101, 2, 'Chamados Fechados', 'Número de chamados fechados pelo técnico', 'Taxa de Reabertura', 'Porcentagem de chamados reabertos após fechamento'),
-(104, 1, 'Produtividade Diária', 'Número de chamados resolvidos por dia', 'Qualidade do Atendimento', 'Avaliação média dos clientes'),
-(103, 1, 'Eficiência de Resolução', 'Percentual de chamados resolvidos no primeiro contato', 'Conformidade com SLAs', 'Percentual de chamados atendidos dentro do SLA');
+(102, 2, 'Satisfação do Cliente', 'Pesquisa de nível de satisfação pós-atendimento', 'Tempo Médio de Atendimento', 'Média de tempo para fechar um chamado'),
+(101, 3, 'Chamados Fechados', 'Número de chamados fechados pelo técnico', 'Taxa de Reabertura', 'Porcentagem de chamados reabertos após fechamento'),
+(104, 4, 'Produtividade Diária', 'Número de chamados resolvidos por dia', 'Qualidade do Atendimento', 'Avaliação média dos clientes'),
+(103, 5, 'Eficiência de Resolução', 'Percentual de chamados resolvidos no primeiro contato', 'Conformidade com SLAs', 'Percentual de chamados atendidos dentro do SLA'),
+(102, 6, 'Serviços concluídos', 'Número total de serviços concluídos', 'Quantidade de serviços de médio/grande porte', 'Quantidade de serviços que possuem o valor acima de 500 reais');
+
+-- -----------------------------------------------------
+-- Table VALOR_KPI
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS VALOR_KPI ( -- Essa tabela deve ser utilizada para armazenar valores quantitativos relativos a cada KPI
+    id_valor_kpi INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    matric_tec INT NOT NULL,
+    kpi_sequencial INT NOT NULL, 
+    data_registro DATE NOT NULL,
+    valor_kpi_numerico DECIMAL(10, 2), -- Eficiência de Resolução,Produtividade Diária,Satisfação do Cliente devem seguir uma escala de 1 a 5, enquanto que Tempo Médio de Resposta e Chamados Fechados devem seguir os valores padrão
+    FOREIGN KEY (matric_tec, kpi_sequencial) REFERENCES KPI (matric_tec, Sequencial)   
+);
 
 -- -----------------------------------------------------
 -- População da Tabela FATURA
