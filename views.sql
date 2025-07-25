@@ -1,4 +1,55 @@
-USE help_desk;
+USE helpdesk;
+
+CREATE OR REPLACE VIEW view_relatorio_resumido AS
+SELECT
+c.razao_social AS razao_social,
+
+ch.prioridade AS prioridade_chamado,
+ch.descricao AS descricao_chamado,
+ch.data,
+
+os.numero AS no_os,
+os.status AS status_os,
+
+pc.descricao AS equipamento
+
+FROM
+	cliente_pj c
+JOIN
+	chamado ch ON c.cod = ch.cod_cliente_pj
+JOIN
+	ordem_servico os ON os.cod_chamado = ch.seq
+JOIN
+	envolveu_ordem_servico_computador eosc ON eosc.cod_num_ordem = os.numero
+JOIN
+	computador pc ON eosc.cod_comp = pc.cod
+    
+UNION
+
+SELECT
+c.razao_social AS razao_social,
+
+ch.prioridade AS prioridade_chamado,
+ch.descricao AS descricao_chamado,
+ch.data,
+
+os.numero AS no_os,
+os.status AS status_os,
+
+imp.descricao as equipamento
+
+FROM
+	cliente_pj c
+JOIN
+	chamado ch ON c.cod = ch.cod_cliente_pj
+JOIN
+	ordem_servico os ON os.cod_chamado = ch.seq
+JOIN
+	envolveu_ordem_servico_impressora eosi ON eosi.cod_num_ordem = os.numero
+JOIN
+	impressora imp ON eosi.cod_impressora = imp.cod;
+	
+    
 CREATE VIEW view_solicitantes AS
 SELECT 
     s.solicitante_id,
