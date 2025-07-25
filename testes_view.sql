@@ -43,3 +43,10 @@ VALUES
 
 
 SELECT * FROM view_relatorio_resumido where data BETWEEN '2025-07-10' AND '2025-07-12';
+
+SELECT * FROM view_relatorio_contrato_equipamento WHERE data_entrada BETWEEN '2024-01-01' AND '2024-12-31';
+SELECT valor_total, COUNT(*) AS qtd_faturas, SUM(valor_servico) AS total_servicos FROM view_relatorio_tecnico_chamado_servico_fatura
+WHERE data_emissao BETWEEN '2024-01-01' AND '2024-12-31' GROUP BY valor_total;
+
+
+

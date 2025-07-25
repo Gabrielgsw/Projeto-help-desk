@@ -48,6 +48,61 @@ JOIN
 	envolveu_ordem_servico_impressora eosi ON eosi.cod_num_ordem = os.numero
 JOIN
 	impressora imp ON eosi.cod_impressora = imp.cod;
+
+
+CREATE OR REPLACE VIEW view_relatorio_contrato_equipamento AS
+
+-- Parte Computador
+SELECT 
+    us.nome AS unidade_suporte,
+    ct.cod AS cod_contrato,
+    pj.razao_social AS cliente,
+    pc.descricao AS equipamento,
+    'Computador' AS tipo_equipamento,
+    pc.data_entrada
+FROM contrato ct
+JOIN cliente_pj pj ON ct.cod_cliente_pj = pj.cod
+JOIN unidade_suporte us ON ct.cod_unidade = us.CNPJ
+JOIN computador pc ON pc.cod_contrato = ct.cod
+
+UNION
+
+-- Parte Impressora
+SELECT 
+    us.nome AS unidade_suporte,
+    ct.cod AS cod_contrato,
+    pj.razao_social AS cliente,
+    imp.descricao AS equipamento,
+    'Impressora' AS tipo_equipamento,
+    imp.data_entrada
+FROM contrato ct
+JOIN cliente_pj pj ON ct.cod_cliente_pj = pj.cod
+JOIN unidade_suporte us ON ct.cod_unidade = us.CNPJ
+JOIN impressora imp ON imp.cod_contrato = ct.cod;
+
+CREATE OR REPLACE VIEW view_relatorio_tecnico_chamado_servico_fatura AS
+SELECT
+    t.nome AS tecnico,
+    t.matricula AS matricula_tecnico,
+    
+    ch.seq AS cod_chamado,
+    ch.descricao AS descricao_chamado,
+    ch.data AS data_chamado,
+    
+    os.numero AS numero_os,
+    os.status AS status_os,
+    
+    s.descricao AS servico,
+    s.valor AS valor_servico,
+    
+    f.cod AS cod_fatura,
+    f.valor_total,
+    f.data_emissao
+FROM ordem_servico os
+JOIN chamado ch ON os.cod_chamado = ch.seq
+JOIN tecnico t ON ch.mat_tec = t.matricula
+JOIN servico s ON s.num_serv = os.numero
+JOIN fatura f ON os.cod_fatura = f.cod;
 	
     
 CREATE VIEW view_solicitantes AS
