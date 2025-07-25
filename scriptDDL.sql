@@ -82,6 +82,20 @@ CREATE TABLE IF NOT EXISTS KPI (
 );
 
 -- -----------------------------------------------------
+-- Table VALOR_KPI
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS VALOR_KPI ( -- Essa tabela deve ser utilizada para armazenar valores quantitativos relativos a cada KPI
+    id_valor_kpi INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    matric_tec INT NOT NULL,
+    kpi_sequencial INT NOT NULL, 
+    data_registro DATE NOT NULL,
+    valor_kpi_numerico DECIMAL(10, 2), -- Eficiência de Resolução,Produtividade Diária,Satisfação do Cliente devem seguir uma escala de 1 a 5, enquanto que Tempo Médio de Resposta e Chamados Fechados devem seguir os valores padrão
+    FOREIGN KEY (matric_tec, kpi_sequencial) REFERENCES KPI (matric_tec, Sequencial)   
+);
+
+
+-- -----------------------------------------------------
 -- Table FATURA
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS FATURA (
