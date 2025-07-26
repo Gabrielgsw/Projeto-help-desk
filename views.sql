@@ -1,4 +1,32 @@
 USE help_desk;
+
+CREATE OR REPLACE VIEW view_relatorio_cliente_os_servico AS
+SELECT
+	c.razao_social,
+    c.prioridade AS prioridade_razao,
+    c.endereco,
+    c.fone,
+    
+    os.status AS status_OS,
+    os.data_criacao,
+    os.prazo_em_dias,
+	
+    ts.descricao AS tipo_servico,
+    
+    s.descricao,
+    s.valor
+    
+FROM
+	chamado ch
+JOIN 
+	ordem_servico os ON ch.Seq = os.cod_chamado
+JOIN
+	cliente_pj c ON ch.cod_cliente_pj = c.cod
+JOIN
+	servico s ON os.numero = s.num_serv
+JOIN
+	tipo_servico ts ON s.cod_tipo_servico = ts.cod;
+    
 CREATE VIEW view_solicitantes AS
 SELECT 
     s.solicitante_id,
@@ -17,8 +45,7 @@ JOIN
     Usuario u ON s.usuario_id = u.usuario_id
 JOIN 
     EmpresaSolicitante e ON s.empresa_id = e.empresa_id;
-
-
+    
 CREATE VIEW view_departamentos AS
 SELECT 
     departamento_id,
