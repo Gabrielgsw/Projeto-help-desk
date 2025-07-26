@@ -137,24 +137,25 @@ INSERT INTO ORCAMENTO (cod, data_abertura, dt_emissao, descricao, validade_n_dia
 
 -- -----------------------------------------------------
 -- População da Tabela ORDEM_SERVICO
+ -- DROP TABLE ORDEM_SERVICO;
 -- -----------------------------------------------------
-INSERT INTO ORDEM_SERVICO (status, data_criacao, prazo_em_dias, dt_devida, cod_orcamento, cod_fatura, cod_chamado) VALUES
-('Em Andamento', '2025-07-21', 5, '2025-07-26', 1, 1, 1), -- Chamado 1: Problema de conexão com a rede principal
-('Aberta', '2025-07-23', 7, '2025-07-30', 2, 3, 2), -- Chamado 2: Instalação de novo software de gestão
-('Concluída', '2025-07-19', 3, '2025-07-22', NULL, NULL, 3), -- Chamado 3: Manutenção preventiva (já resolvido, pode não ter fatura/orcamento direto)
-('Em Andamento', '2025-07-24', 10, '2025-08-03', 3, NULL, 4), -- Chamado 4: Falha crítica no sistema de backup
-('Aberta', '2025-07-24', 2, '2025-07-26', NULL, 5, 5), -- Chamado 5: Configuração de impressora de rede
-('Em Andamento', '2025-07-25', 8, '2025-08-02', 4, NULL, 6), -- Chamado 6: Servidor de arquivos lentidão
-('Concluída', '2025-07-24', 1, '2025-07-25', NULL, NULL, 7), -- Chamado 7: Instalação Office
-('Aberta', '2025-07-25', 15, '2025-08-09', 5, NULL, 8), -- Chamado 8: Ataque de ransomware
-('Em Andamento', '2025-07-25', 3, '2025-07-28', NULL, NULL, 9), -- Chamado 9: Impressora de produção não reconhecida
-('Aberta', '2025-07-24', 2, '2025-07-26', NULL, NULL, 10), -- Chamado 10: Solicitação de nova conta de e-mail
-('Em Andamento', '2025-07-25', 7, '2025-08-01', 6, NULL, 11), -- Chamado 11: Falha no backup diário
-('Aberta', '2025-07-25', 4, '2025-07-29', NULL, NULL, 12), -- Chamado 12: Tela azul em computador
-('Concluída', '2025-07-23', 1, '2025-07-24', NULL, NULL, 13), -- Chamado 13: Erro ao abrir aplicativo (já resolvido)
-('Em Andamento', '2025-07-25', 5, '2025-07-30', NULL, NULL, 14), -- Chamado 14: Configuração de VPN
-('Aberta', '2025-07-25', 12, '2025-08-06', 7, NULL, 15), -- Chamado 15: Servidor web offline
-('Pendente', '2025-07-25', 3, '2025-07-28', NULL, NULL, 16); -- Chamado 16: Teclado e mouse sem fio
+INSERT INTO ORDEM_SERVICO (status, data_criacao, prazo_em_dias, cod_orcamento, cod_fatura, cod_chamado) VALUES
+('Em Andamento', '2025-07-21', 5, 1, 1, 1), -- Chamado 1: Problema de conexão com a rede principal
+('Aberta', '2025-07-23', 7,  2, 3, 2), -- Chamado 2: Instalação de novo software de gestão
+('Concluída', '2025-07-19', 3,  NULL, NULL, 3), -- Chamado 3: Manutenção preventiva (já resolvido, pode não ter fatura/orcamento direto)
+('Em Andamento', '2025-07-24', 10, 3, NULL, 4), -- Chamado 4: Falha crítica no sistema de backup
+('Aberta', '2025-07-24', 2,  NULL, 5, 5), -- Chamado 5: Configuração de impressora de rede
+('Em Andamento', '2025-07-25', 8,  4, NULL, 6), -- Chamado 6: Servidor de arquivos lentidão
+('Concluída', '2025-07-24', 1,  NULL, NULL, 7), -- Chamado 7: Instalação Office
+('Aberta', '2025-07-25', 15, 5, NULL, 8), -- Chamado 8: Ataque de ransomware
+('Em Andamento', '2025-07-25', 3,  NULL, NULL, 9), -- Chamado 9: Impressora de produção não reconhecida
+('Aberta', '2025-07-24', 2,  NULL, NULL, 10), -- Chamado 10: Solicitação de nova conta de e-mail
+('Em Andamento', '2025-07-25', 7,  6, NULL, 11), -- Chamado 11: Falha no backup diário
+('Aberta', '2025-07-25', 4,  NULL, NULL, 12), -- Chamado 12: Tela azul em computador
+('Concluída', '2025-07-23', 1,  NULL, NULL, 13), -- Chamado 13: Erro ao abrir aplicativo (já resolvido)
+('Em Andamento', '2025-07-25', 5, NULL, NULL, 14), -- Chamado 14: Configuração de VPN
+('Aberta', '2025-07-25', 12,  7, NULL, 15), -- Chamado 15: Servidor web offline
+('Pendente', '2025-07-25', 3,  NULL, NULL, 16); -- Chamado 16: Teclado e mouse sem fio
 
 -- -----------------------------------------------------
 -- População da Tabela TIPO_SERVICO
