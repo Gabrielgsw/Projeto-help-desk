@@ -43,3 +43,23 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+-- Trigger para atualizar dt_Devida
+
+DELIMITER ;
+
+-- DROP TRIGGER IF EXISTS trigger_updt_dt_devida; 
+DELIMITER //
+
+CREATE TRIGGER trigger_updt_dt_devida
+BEFORE INSERT ON ORDEM_SERVICO
+FOR EACH ROW
+BEGIN
+    IF NEW.data_criacao IS NOT NULL AND NEW.prazo_em_dias IS NOT NULL THEN -- verifica se data_criacao e prazo_em_dias não são NULL
+        SET NEW.dt_devida = DATE_ADD(NEW.data_criacao, INTERVAL NEW.prazo_em_dias DAY); -- dt_devida = data_criacao + prazo_em_dias
+    END IF; 
+END;
+//
+
+DELIMITER ;
