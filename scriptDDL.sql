@@ -80,11 +80,9 @@ CREATE TABLE IF NOT EXISTS KPI (
     PRIMARY KEY (matric_tec, Sequencial),
     FOREIGN KEY (matric_tec) REFERENCES TECNICO (Matricula)
 );
-
 -- -----------------------------------------------------
 -- Table VALOR_KPI
 -- -----------------------------------------------------
-
 CREATE TABLE IF NOT EXISTS VALOR_KPI ( -- Essa tabela deve ser utilizada para armazenar valores quantitativos relativos a cada KPI
     id_valor_kpi INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     matric_tec INT NOT NULL,

@@ -50,18 +50,6 @@ INSERT INTO KPI (matric_tec, Sequencial, KPI_1, dsc_KPI_1, KPI_2, dsc_KPI_2) VAL
 (102, 6, 'Serviços concluídos', 'Número total de serviços concluídos', 'Quantidade de serviços de médio/grande porte', 'Quantidade de serviços que possuem o valor acima de 500 reais');
 
 -- -----------------------------------------------------
--- Table VALOR_KPI
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS VALOR_KPI ( -- Essa tabela deve ser utilizada para armazenar valores quantitativos relativos a cada KPI
-    id_valor_kpi INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    matric_tec INT NOT NULL,
-    kpi_sequencial INT NOT NULL, 
-    data_registro DATE NOT NULL,
-    valor_kpi_numerico DECIMAL(10, 2), -- Eficiência de Resolução,Produtividade Diária,Satisfação do Cliente devem seguir uma escala de 1 a 5, enquanto que Tempo Médio de Resposta e Chamados Fechados devem seguir os valores padrão
-    FOREIGN KEY (matric_tec, kpi_sequencial) REFERENCES KPI (matric_tec, Sequencial)   
-);
-
--- -----------------------------------------------------
 -- População da Tabela FATURA
 -- -----------------------------------------------------
 INSERT INTO FATURA (cod, n_parcelas, data_emissao, valor_total, status, cod_cliente_pj) VALUES

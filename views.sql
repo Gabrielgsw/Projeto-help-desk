@@ -192,8 +192,8 @@ JOIN
     view_departamentos d ON t.departamento_id = d.departamento_id
 ORDER BY
     d.nome, t.nome_usuario;
+    
 -- Relatório de chamados por solicitante
-
 SELECT
     s.solicitante_id,
     s.nome_usuario AS nome_solicitante,
