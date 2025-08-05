@@ -21,143 +21,66 @@ CREATE ROLE IF NOT EXISTS 'cliente_pj';
 -- Concessão de TODOS os privilégios para o papel 'admin'
 GRANT ALL PRIVILEGES ON HelpDesk.* TO 'admin';
 
+-- Grants for Supervisor Role
+GRANT SELECT, UPDATE ON UNIDADE_SUPORTE TO 'supervisor';
+GRANT SELECT, UPDATE ON SUPERVISOR TO 'supervisor';
+GRANT SELECT, UPDATE ON KPI TO 'supervisor';
+GRANT SELECT, UPDATE ON CLIENTE_PJ TO 'supervisor';
+GRANT SELECT, UPDATE ON FATURA TO 'supervisor';
+GRANT SELECT, UPDATE ON PARCELA_FATURA TO 'supervisor';
+GRANT SELECT, INSERT, UPDATE, DELETE ON CHAMADO TO 'supervisor'; -- C, R, U, D
+GRANT SELECT, INSERT, UPDATE, DELETE ON ORDEM_SERVICO TO 'supervisor'; -- C, R, U, D
+GRANT SELECT, INSERT, UPDATE, DELETE ON SERVICO TO 'supervisor'; -- C, R, U, D
+GRANT SELECT, UPDATE ON TIPO_SERVICO TO 'supervisor';
+GRANT SELECT, UPDATE ON ORCAMENTO TO 'supervisor';
+GRANT SELECT, UPDATE ON COMPUTADOR TO 'supervisor';
+GRANT SELECT, UPDATE ON IMPRESSORA TO 'supervisor';
+GRANT SELECT, UPDATE ON DRIVER_IMPRESSORA TO 'supervisor';
+GRANT SELECT, UPDATE ON COMPONENTE TO 'supervisor';
+GRANT SELECT, UPDATE ON CONTRATO TO 'supervisor';
+GRANT SELECT, INSERT, UPDATE ON Possui_computador_componente TO 'supervisor'; -- C, R, U
+GRANT SELECT, INSERT, UPDATE ON Envolveu_Ordem_Servico_Computador TO 'supervisor'; -- C, R, U
+GRANT SELECT, INSERT, UPDATE ON Envolveu_Ordem_Servico_Impressora TO 'supervisor'; -- C, R, U
+GRANT SELECT, INSERT, UPDATE ON TECNICO TO 'supervisor'; -- C, R, U
+GRANT SELECT, INSERT, UPDATE, DELETE ON VALOR_KPI TO 'supervisor'; -- C, R, U, D
 
--- Para a função 'verificar_contrato_em_dia'
--- Técnico (RU -> E), Supervisor (RU -> E), Cliente_PJ (R -> E)
-GRANT EXECUTE ON FUNCTION verificar_contrato_em_dia TO 'tecnico';
-GRANT EXECUTE ON FUNCTION verificar_contrato_em_dia TO 'supervisor';
-GRANT EXECUTE ON FUNCTION verificar_contrato_em_dia TO 'cliente_pj';
-
--- Para a função 'verificar_fatura_criada'
--- Técnico (RU -> E), Supervisor (RU -> E), Cliente_PJ (R -> E)
-GRANT EXECUTE ON FUNCTION verificar_fatura_criada TO 'tecnico';
-GRANT EXECUTE ON FUNCTION verificar_fatura_criada TO 'supervisor';
-GRANT EXECUTE ON FUNCTION verificar_fatura_criada TO 'cliente_pj';
-
--- Para a função 'verificar_pagamentos_em_dia'
--- Técnico (RU -> E), Supervisor (RU -> E), Cliente_PJ (R -> E)
-GRANT EXECUTE ON FUNCTION verificar_pagamentos_em_dia TO 'tecnico';
-GRANT EXECUTE ON FUNCTION verificar_pagamentos_em_dia TO 'supervisor';
-GRANT EXECUTE ON FUNCTION verificar_pagamentos_em_dia TO 'cliente_pj';
-
--- Para a stored procedure 'sp_gerar_kpi_para_tecnico_especifico'
--- Técnico (RU -> E), Supervisor (RU -> E)
-GRANT EXECUTE ON PROCEDURE sp_gerar_kpi_para_tecnico_especifico TO 'tecnico';
-GRANT EXECUTE ON PROCEDURE sp_gerar_kpi_para_tecnico_especifico TO 'supervisor';
-
--- Para a stored procedure 'procedure_atualizar_os_concluidas'
--- Técnico (RU -> E), Supervisor (RU -> E)
-GRANT EXECUTE ON PROCEDURE procedure_atualizar_os_concluidas TO 'tecnico'; -- O grant anterior do tecnico tinha essa SP, mas a planilha não mostra. Ajustando conforme a planilha.
-GRANT EXECUTE ON PROCEDURE procedure_atualizar_os_concluidas TO 'supervisor';
-
-
--- -----------------------------------------------------
--- Concessão de Permissões para Views (Relatórios)
--- As views são sempre consultadas com permissões de SELECT (Read).
--- Na planilha, 'R' indica SELECT.
--- -----------------------------------------------------
-
--- Para a view 'chamados encerrados por tipo de serviço'
--- Técnico (R), Supervisor (R), Cliente_PJ (R)
-GRANT SELECT ON view_chamados_encerrados_por_tipo_servico TO 'tecnico'; -- Assumindo o nome completo da view
-GRANT SELECT ON view_chamados_encerrados_por_tipo_servico TO 'supervisor';
-GRANT SELECT ON view_chamados_encerrados_por_tipo_servico TO 'cliente_pj';
-
--- Para a view 'todos os chamados agrupados por tipo de serviço'
--- Técnico (R), Supervisor (R), Cliente_PJ (R)
-GRANT SELECT ON view_chamados_por_tipo_servico TO 'tecnico';
-GRANT SELECT ON view_chamados_por_tipo_servico TO 'supervisor';
-GRANT SELECT ON view_chamados_por_tipo_servico TO 'cliente_pj';
-
--- Para a view 'técnicos por departamento'
--- Técnico (R), Supervisor (R), Cliente_PJ (R)
-GRANT SELECT ON view_tecnicos_por_departamento TO 'tecnico'; -- Assumindo o nome completo da view
-GRANT SELECT ON view_tecnicos_por_departamento TO 'supervisor';
-GRANT SELECT ON view_tecnicos_por_departamento TO 'cliente_pj';
-
--- Para a view 'chamados por solicitante'
--- Técnico (R), Supervisor (R), Cliente_PJ (R)
-GRANT SELECT ON view_chamados_por_solicitante TO 'tecnico'; -- Assumindo o nome completo da view
-GRANT SELECT ON view_chamados_por_solicitante TO 'supervisor';
-GRANT SELECT ON view_chamados_por_solicitante TO 'cliente_pj';
-
--- -----------------------------------------------------
--- Concessão de Permissões DML para Disparar Triggers
--- -----------------------------------------------------
-
--- Permissões para o papel 'supervisor'
--- Já possui C,R,U,D em UNIDADE_SUPORTE e CHAMADO.
--- Já possui C,R,U em TECNICO, SUPERVISOR, ORDEM_SERVICO, SERVICO, KPI, VALOR_KPI.
--- Estas permissões já cobrem os disparos de triggers relacionados a essas tabelas.
-GRANT SELECT, INSERT, UPDATE, DELETE ON UNIDADE_SUPORTE TO 'supervisor';
-GRANT SELECT, INSERT, UPDATE ON SUPERVISOR TO 'supervisor';
-GRANT SELECT, INSERT, UPDATE ON TECNICO TO 'supervisor';
-GRANT SELECT, INSERT, UPDATE ON KPI TO 'supervisor';
-GRANT SELECT, INSERT, UPDATE ON VALOR_KPI TO 'supervisor';
-GRANT SELECT, INSERT, UPDATE, DELETE ON CHAMADO TO 'supervisor';
-GRANT SELECT, INSERT, UPDATE ON ORDEM_SERVICO TO 'supervisor';
-GRANT SELECT, INSERT, UPDATE ON SERVICO TO 'supervisor';
--- Adicionei as permissões de SELECT para as demais tabelas para o supervisor,
--- conforme a lógica de que ele precisa visualizar a maioria dos dados.
-GRANT SELECT ON CLIENTE_PJ TO 'supervisor';
-GRANT SELECT ON FATURA TO 'supervisor';
-GRANT SELECT ON PARCELA_FATURA TO 'supervisor';
-GRANT SELECT ON ORCAMENTO TO 'supervisor';
-GRANT SELECT ON TIPO_SERVICO TO 'supervisor';
-GRANT SELECT ON CONTRATO TO 'supervisor';
-GRANT SELECT ON COMPUTADOR TO 'supervisor';
-GRANT SELECT ON IMPRESSORA TO 'supervisor';
-GRANT SELECT ON DRIVER_IMPRESSORA TO 'supervisor';
-GRANT SELECT ON COMPONENTE TO 'supervisor';
-GRANT SELECT ON DRIVER TO 'supervisor';
-GRANT SELECT ON Possui_computador_componente TO 'supervisor';
-GRANT SELECT ON Envolveu_Ordem_Servico_Computador TO 'supervisor';
-GRANT SELECT ON Envolveu_Ordem_Servico_Impressora TO 'supervisor';
-
-
--- Permissões para o papel 'tecnico'
--- Já possui SELECT, UPDATE em TECNICO, CHAMADO, ORDEM_SERVICO, SERVICO.
--- Estas permissões já cobrem os disparos de triggers relacionados a essas tabelas.
-GRANT SELECT, UPDATE ON TECNICO TO 'tecnico';
-GRANT SELECT, UPDATE ON CHAMADO TO 'tecnico';
-GRANT SELECT, UPDATE ON ORDEM_SERVICO TO 'tecnico';
-GRANT SELECT, UPDATE ON SERVICO TO 'tecnico';
--- Adicionei as permissões de SELECT para as demais tabelas para o técnico,
--- conforme a lógica de que ele precisa visualizar dados para seu trabalho.
+-- Grants for TECNICO Role
 GRANT SELECT ON UNIDADE_SUPORTE TO 'tecnico';
-GRANT SELECT ON CLIENTE_PJ TO 'tecnico';
 GRANT SELECT ON SUPERVISOR TO 'tecnico';
 GRANT SELECT ON KPI TO 'tecnico';
-GRANT SELECT ON VALOR_KPI TO 'tecnico';
+GRANT SELECT ON CLIENTE_PJ TO 'tecnico';
 GRANT SELECT ON FATURA TO 'tecnico';
 GRANT SELECT ON PARCELA_FATURA TO 'tecnico';
-GRANT SELECT ON ORCAMENTO TO 'tecnico';
+GRANT SELECT, INSERT, UPDATE ON CHAMADO TO 'tecnico'; -- C, R, U
+GRANT SELECT, INSERT, UPDATE ON ORDEM_SERVICO TO 'tecnico'; -- C, R, U
+GRANT SELECT, INSERT, UPDATE ON SERVICO TO 'tecnico'; -- C, R, U
 GRANT SELECT ON TIPO_SERVICO TO 'tecnico';
+GRANT SELECT ON ORCAMENTO TO 'tecnico';
+GRANT SELECT, UPDATE ON COMPUTADOR TO 'tecnico'; -- R, U
+GRANT SELECT, UPDATE ON IMPRESSORA TO 'tecnico'; -- R, U
+GRANT SELECT, UPDATE ON DRIVER_IMPRESSORA TO 'tecnico'; -- R, U
+GRANT SELECT, UPDATE ON COMPONENTE TO 'tecnico'; -- R, U
 GRANT SELECT ON CONTRATO TO 'tecnico';
-GRANT SELECT ON COMPUTADOR TO 'tecnico';
-GRANT SELECT ON IMPRESSORA TO 'tecnico';
-GRANT SELECT ON DRIVER_IMPRESSORA TO 'tecnico';
-GRANT SELECT ON COMPONENTE TO 'tecnico';
-GRANT SELECT ON DRIVER TO 'tecnico';
-GRANT SELECT ON Possui_computador_componente TO 'tecnico';
-GRANT SELECT ON Envolveu_Ordem_Servico_Computador TO 'tecnico';
-GRANT SELECT ON Envolveu_Ordem_Servico_Impressora TO 'tecnico';
+GRANT SELECT, INSERT, UPDATE ON Possui_computador_componente TO 'tecnico'; -- C, R, U
+GRANT SELECT, INSERT, UPDATE ON Envolveu_Ordem_Servico_Computador TO 'tecnico'; -- C, R, U
+GRANT SELECT, INSERT, UPDATE ON Envolveu_Ordem_Servico_Impressora TO 'tecnico'; -- C, R, U
+GRANT SELECT ON VALOR_KPI TO 'tecnico'; -- R
 
-
--- Permissões para o papel 'cliente_pj'
--- Para 'trigger_kpi_chamados':
--- A planilha indica 'C' (Create/Insert) e 'U' (Update) para CLIENTE_PJ em CHAMADO.
--- 'INSERT' já estava presente. Adicionando 'UPDATE' para cobrir o 'U' implícito.
-GRANT SELECT, INSERT, UPDATE ON CHAMADO TO 'cliente_pj';
-
--- As demais permissões para CLIENTE_PJ
+-- Grants for CLIENTE_PJ Role
 GRANT SELECT ON CLIENTE_PJ TO 'cliente_pj';
 GRANT SELECT ON FATURA TO 'cliente_pj';
 GRANT SELECT ON PARCELA_FATURA TO 'cliente_pj';
+GRANT SELECT, INSERT, UPDATE ON CHAMADO TO 'cliente_pj'; -- C, R, U
 GRANT SELECT ON ORDEM_SERVICO TO 'cliente_pj';
+GRANT SELECT ON ORCAMENTO TO 'cliente_pj';
 GRANT SELECT ON CONTRATO TO 'cliente_pj';
-GRANT SELECT ON COMPUTADOR TO 'cliente_pj';
-GRANT SELECT ON IMPRESSORA TO 'cliente_pj';
+
+GRANT EXECUTE ON PROCEDURE GerarKPIParaTecnicoPorPeriodo TO 'tecnico', 'supervisor', 'admin';
+GRANT EXECUTE ON PROCEDURE InserirImpressorasViaCursor TO 'tecnico', 'supervisor', 'admin';
+GRANT EXECUTE ON PROCEDURE InserirDriversViaCursor TO 'tecnico', 'supervisor', 'admin';
+GRANT EXECUTE ON PROCEDURE InserirComputadoresViaCursor TO 'tecnico', 'supervisor', 'admin';
+GRANT EXECUTE ON PROCEDURE InserirImpressorasViaCursor TO 'tecnico', 'supervisor', 'admin';
+GRANT EXECUTE ON PROCEDURE procedure_atualizar_os_concluidas TO 'supervisor', 'admin'; -- Assuming it's a callable procedure
 
 -- -----------------------------------------------------
 -- 3. Criação de Usuários e Atribuição de Papéis
