@@ -1,5 +1,56 @@
-USE help_desk;
+USE HelpDesk;
 
+ -- Relatório 1
+ CREATE OR REPLACE VIEW view_relatorio_resumido AS
+SELECT
+c.razao_social AS razao_social,
+
+ch.prioridade AS prioridade_chamado,
+ch.descricao AS descricao_chamado,
+ch.data,
+
+os.numero AS no_os,
+os.status AS status_os,
+
+pc.descricao AS equipamento
+
+FROM
+	cliente_pj c
+JOIN
+	chamado ch ON c.cod = ch.cod_cliente_pj
+JOIN
+	ordem_servico os ON os.cod_chamado = ch.seq
+JOIN
+	envolveu_ordem_servico_computador eosc ON eosc.cod_num_ordem = os.numero
+JOIN
+	computador pc ON eosc.cod_comp = pc.cod
+    
+UNION
+
+SELECT
+c.razao_social AS razao_social,
+
+ch.prioridade AS prioridade_chamado,
+ch.descricao AS descricao_chamado,
+ch.data,
+
+os.numero AS no_os,
+os.status AS status_os,
+
+imp.descricao as equipamento
+
+FROM
+	cliente_pj c
+JOIN
+	chamado ch ON c.cod = ch.cod_cliente_pj
+JOIN
+	ordem_servico os ON os.cod_chamado = ch.seq
+JOIN
+	envolveu_ordem_servico_impressora eosi ON eosi.cod_num_ordem = os.numero
+JOIN
+	impressora imp ON eosi.cod_impressora = imp.cod;
+
+-- Relatório 2
 CREATE OR REPLACE VIEW view_relatorio_cliente_os_servico AS
 SELECT
 	c.razao_social,
@@ -26,222 +77,104 @@ JOIN
 	servico s ON os.numero = s.num_serv
 JOIN
 	tipo_servico ts ON s.cod_tipo_servico = ts.cod;
-    
-CREATE VIEW view_solicitantes AS
-SELECT 
-    s.solicitante_id,
-    
-    u.usuario_id,
-    u.nome AS nome_usuario,
-    u.email,
-    u.telefone,
-    
-    e.empresa_id,
-    e.nome AS nome_empresa,
-    e.cnpj
-FROM 
-    Solicitante s
-JOIN 
-    Usuario u ON s.usuario_id = u.usuario_id
-JOIN 
-    EmpresaSolicitante e ON s.empresa_id = e.empresa_id;
-    
-CREATE VIEW view_departamentos AS
-SELECT 
-    departamento_id,
-    nome,
-    descricao
-FROM 
-    Departamento;
-
-
-CREATE VIEW view_chamados AS
-SELECT 
-    ch.chamado_id,
-    ch.titulo,
-    ch.descricao,
-    ch.data_abertura,
-    ch.data_encerramento,
-    
-    st.status_id,
-    st.descricao AS status,
-
-    sla.sla_id,
-    sla.tempo_resposta,
-    sla.tempo_solucao,
-
-    ts.tipo_servico_id,
-    ts.nome AS tipo_servico,
-
-    sub.subtipo_id,
-    sub.nome AS subtipo_servico,
-
-    sol.solicitante_id,
-    tec.tecnico_id
-
-FROM 
-    Chamado ch
-JOIN 
-    StatusChamado st ON ch.status_id = st.status_id
-JOIN 
-    SLA sla ON ch.sla_id = sla.sla_id
-JOIN 
-    TipoServico ts ON ch.tipo_servico_id = ts.tipo_servico_id
-JOIN 
-    SubtipoServico sub ON ch.subtipo_id = sub.subtipo_id
-JOIN 
-    Solicitante sol ON ch.solicitante_id = sol.solicitante_id
-JOIN 
-    Tecnico tec ON ch.tecnico_id = tec.tecnico_id
-JOIN 
-    Usuario u ON tec.usuario_id = u.usuario_id;  
-
-
-CREATE VIEW view_tecnicos AS
-SELECT 
-    t.tecnico_id,
-    u.usuario_id,
-    u.nome AS nome_usuario,
-    c.cargo_id,
-    c.nome AS nome_cargo,
-    d.departamento_id,
-    d.nome AS nome_departamento,
-    a.area_atuacao_id,
-    a.descricao AS nome_area_atuacao
-FROM 
-    Tecnico t
-JOIN 
-    Usuario u ON t.usuario_id = u.usuario_id
-JOIN 
-    Cargo c ON t.cargo_id = c.cargo_id
-JOIN 
-    Departamento d ON t.departamento_id = d.departamento_id
-JOIN 
-    AreaAtuacao a ON t.area_atuacao_id = a.area_atuacao_id;
-
-
-
-CREATE VIEW view_empresas AS
+ 
+ -- Relatório 3
+ CREATE OR REPLACE VIEW Vw_Relatorio_Equipamentos_Contrato AS
 SELECT
-    e.empresa_id,
-    e.nome AS empresa_nome,
-    e.cnpj AS empresa_cnpj,
-    e.logradouro_id AS empresa_endereco
-FROM EmpresaSolicitante e;
+    us.nome AS Nome_Unidade_Suporte,
+    us.CNPJ AS CNPJ_Unidade,
+    cpj.razao_social AS Cliente,
+    ct.cod AS Codigo_Contrato,
+    ct.dt_inicio AS Data_Inicio_Contrato,
+    ct.status AS Status_Contrato,
+    eq.Tipo_Equipamento,
+    eq.Codigo_Equipamento,
+    eq.Descricao_Equipamento,
+    eq.Data_Entrada_Equipamento,
+    ct.cod_cliente_pj,
+    ct.cod_unidade
+FROM
+    CONTRATO AS ct
+JOIN
+    UNIDADE_SUPORTE AS us ON ct.cod_unidade = us.CNPJ
+JOIN
+    CLIENTE_PJ AS cpj ON ct.cod_cliente_pj = cpj.Cod
+JOIN
+    (
+        -- Seleciona todos os computadores
+        SELECT
+            cod_contrato,
+            'Computador' AS Tipo_Equipamento,
+            cod AS Codigo_Equipamento,
+            CONCAT(fabricante, ' - ', tipo) AS Descricao_Equipamento,
+            data_entrada AS Data_Entrada_Equipamento
+        FROM
+            COMPUTADOR
+        UNION ALL
+        -- Seleciona todas as impressoras
+        SELECT
+            cod_contrato,
+            'Impressora' AS Tipo_Equipamento,
+            cod AS Codigo_Equipamento,
+            CONCAT(fabricante, ' - ', modelo) AS Descricao_Equipamento,
+            data_entrada AS Data_Entrada_Equipamento
+        FROM
+            IMPRESSORA
+    ) AS eq ON ct.cod = eq.cod_contrato;
 
-CREATE VIEW view_empresas_solicitantes AS
-SELECT 
-    e.empresa_id,
-    e.nome AS nome_empresa,
-    e.cnpj,
-    
-    l.logradouro_id,
-    l.rua,
-    l.numero,
-    l.bairro_id
-FROM 
-    EmpresaSolicitante e
-JOIN 
-    Logradouro l ON e.logradouro_id = l.logradouro_id;
 
-
--- Relatórios
-
-SELECT *
-FROM view_chamados;
--- WHERE data_abertura BETWEEN '2025-01-01' AND '2025-07-01';
--- Relatório chamados encerrados por tipo de serviço;
-
-SELECT sla_id, tempo_resposta, tempo_solucao FROM SLA;
-
+-- Relatório 4
+CREATE OR REPLACE VIEW Vw_Relatorio_Faturamento_Tecnico AS
 SELECT
-    vc.tipo_servico AS tipo_de_servico,
-    COUNT(vc.chamado_id) AS total_chamados,
-    COUNT(CASE WHEN vc.data_encerramento IS NOT NULL THEN 1 END) AS chamados_encerrados
+    F.cod AS Codigo_Fatura,
+    F.valor_total AS Valor_Total_Fatura,
+    F.data_emissao AS Data_Emissao_Fatura,
+    F.status AS Status_Fatura,
+    OS.numero AS Numero_OS,
+    OS.status AS Status_OS,
+    T.nome AS Nome_Tecnico,
+    T.Matricula AS Matricula_Tecnico,
+    C.Seq AS Codigo_Chamado,
+    C.tipo AS Tipo_Chamado,
+    -- Agrega a descrição de todos os serviços da OS em um único campo de texto
+    GROUP_CONCAT(S.descricao SEPARATOR '; ') AS Servicos_Realizados,
+    -- Soma o valor de todos os serviços da OS
+    SUM(S.valor) AS Soma_Valor_Servicos
 FROM
-    view_chamados vc
-GROUP BY
-    vc.tipo_servico
-ORDER BY
-    total_chamados DESC;
--- Relatório de todos os chamados agrupados por tipo de serviço
-CREATE VIEW view_chamados_por_tipo_servico AS
-SELECT
-    tipo_servico_id,
-    tipo_servico,
-    COUNT(chamado_id) AS total_chamados
-FROM
-    view_chamados
-GROUP BY
-    tipo_servico_id,
-    tipo_servico;
-
--- Relatório de técnicos por departamento
-SELECT
-    d.departamento_id,
-    d.nome AS nome_departamento,
-
-    t.tecnico_id,
-    t.nome_usuario AS nome_tecnico,
-    t.nome_cargo,
-    t.nome_area_atuacao
-
-FROM
-    view_tecnicos t
-JOIN
-    view_departamentos d ON t.departamento_id = d.departamento_id
-ORDER BY
-    d.nome, t.nome_usuario;
-    
--- Relatório de chamados por solicitante
-SELECT
-    s.solicitante_id,
-    s.nome_usuario AS nome_solicitante,
-    s.email,
-    s.telefone,
-    s.nome_empresa,
-    s.cnpj,
-
-    COUNT(c.chamado_id) AS total_chamados,
-    COUNT(CASE WHEN c.data_encerramento IS NOT NULL THEN 1 END) AS chamados_encerrados,
-    COUNT(CASE WHEN c.data_encerramento IS NULL THEN 1 END) AS chamados_abertos
-
-FROM
-    view_chamados c
-JOIN
-    view_solicitantes s ON c.solicitante_id = s.solicitante_id
-
-GROUP BY
-    s.solicitante_id,
-    s.nome_usuario,
-    s.email,
-    s.telefone,
-    s.nome_empresa,
-    s.cnpj
-
-ORDER BY
-    total_chamados DESC;
-    
-    SELECT
-    c.chamado_id,
-    c.titulo,
-    c.descricao,
-    c.data_abertura,
-    c.data_encerramento,
-    sc.descricao AS status_chamado,
-    u_sol.nome AS solicitante,
-    u_tec.nome AS tecnico
-FROM
-    Chamado c
-JOIN
-    StatusChamado sc ON c.status_id = sc.status_id
-JOIN
-    Solicitante s ON c.solicitante_id = s.solicitante_id
-JOIN
-    Usuario u_sol ON s.usuario_id = u_sol.usuario_id
-LEFT JOIN -- LEFT JOIN caso um técnico não esteja atribuído ou o ID seja inválido
-    Tecnico t ON c.tecnico_id = t.tecnico_id
+    ORDEM_SERVICO AS OS
 LEFT JOIN
-    Usuario u_tec ON t.usuario_id = u_tec.usuario_id
-WHERE
-    sc.descricao = 'Fechado';
+    FATURA AS F ON OS.cod_fatura = F.cod
+LEFT JOIN
+    CHAMADO AS C ON OS.cod_chamado = C.Seq
+LEFT JOIN
+    TECNICO AS T ON C.mat_tec = T.Matricula
+LEFT JOIN
+    SERVICO AS S ON OS.numero = S.num_serv
+-- Agrupa por ordem de serviço
+GROUP BY
+    OS.numero, F.cod, C.Seq, T.Matricula;
+ 
+
+
+ -- Teste relatório 1
+ SELECT * FROM view_relatorio_resumido where data BETWEEN '2025-01-10' AND '2025-08-12'; 
+  
+ -- Teste relatório 2
+SELECT * FROM view_relatorio_cliente_os_servico where data_criacao BETWEEN '2025-07-25' AND '2025-07-27';
+
+-- Teste relatório 3
+
+SELECT  * FROM Vw_Relatorio_Equipamentos_Contrato WHERE  
+    Data_Inicio_Contrato BETWEEN '2024-01-01' AND '2025-12-31'
+ORDER BY
+    Nome_Unidade_Suporte,
+    Cliente,
+    Tipo_Equipamento;
+
+-- Teste relatório 4
+
+SELECT * FROM Vw_Relatorio_Faturamento_Tecnico WHERE    
+    Data_Emissao_Fatura BETWEEN '2024-01-01' AND '2025-12-30'
+    AND Valor_Total_Fatura IS NOT NULL 
+ORDER BY    
+    Valor_Total_Fatura DESC;
