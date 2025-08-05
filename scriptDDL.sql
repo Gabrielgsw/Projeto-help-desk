@@ -1,7 +1,6 @@
-CREATE DATABASE HelpDesk;
+
 USE HelpDesk;
 
--- Desabilita a verificação de chaves estrangeiras temporariamente.
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- -----------------------------------------------------
@@ -83,6 +82,7 @@ CREATE TABLE IF NOT EXISTS KPI (
 -- -----------------------------------------------------
 -- Table VALOR_KPI
 -- -----------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS VALOR_KPI ( -- Essa tabela deve ser utilizada para armazenar valores quantitativos relativos a cada KPI
     id_valor_kpi INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     matric_tec INT NOT NULL,
@@ -92,16 +92,16 @@ CREATE TABLE IF NOT EXISTS VALOR_KPI ( -- Essa tabela deve ser utilizada para ar
     FOREIGN KEY (matric_tec, kpi_sequencial) REFERENCES KPI (matric_tec, Sequencial)   
 );
 
-
 -- -----------------------------------------------------
 -- Table FATURA
 -- -----------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS FATURA (
     cod INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     n_parcelas INT,
     data_emissao DATE,
     valor_total DECIMAL(10,2),
-    status VARCHAR(50), -- -- 'Aberta', 'Paga', 'Atrasada'
+    status VARCHAR(50), -- 'Aberta', 'Paga', 'Atrasada'
     cod_cliente_pj INT,    
     FOREIGN KEY (cod_cliente_pj) REFERENCES CLIENTE_PJ (Cod)
 );
@@ -109,16 +109,16 @@ CREATE TABLE IF NOT EXISTS FATURA (
 -- -----------------------------------------------------
 -- Table PARCELA_FATURA
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS PARCELA_FATURA ( -- Entidade criada para armazenar as parcelas de uma fatura
+CREATE TABLE IF NOT EXISTS PARCELA_FATURA (
     parcela_id INT NOT NULL AUTO_INCREMENT,
     cod_fatura INT NOT NULL,
     numero_parcela INT NOT NULL,
     valor_parcela DECIMAL(10,2),
     data_vencimento DATE NOT NULL,
-    data_pagamento DATE, -- NULL se ainda não foi paga
+    data_pagamento DATE, 
     status_parcela VARCHAR(50) NOT NULL DEFAULT 'Aberta', -- 'Aberta', 'Paga', 'Atrasada'
     PRIMARY KEY (parcela_id),
-    UNIQUE (cod_fatura, numero_parcela), -- Garante unicidade de parcela por fatura
+    UNIQUE (cod_fatura, numero_parcela), 
     FOREIGN KEY (cod_fatura) REFERENCES FATURA (cod)
 );
 
@@ -157,6 +157,7 @@ CREATE TABLE IF NOT EXISTS ORCAMENTO (
 -- -----------------------------------------------------
 -- Table ORDEM_SERVICO
 -- -----------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS ORDEM_SERVICO (
     numero INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     status VARCHAR(50), -- Esse status deve ser atualizado conforme atualização no status do chamado
@@ -314,7 +315,7 @@ CREATE TABLE IF NOT EXISTS Envolveu_Ordem_Servico_Impressora (
     FOREIGN KEY (cod_num_ordem) REFERENCES ORDEM_SERVICO (numero)
 );
 
--- Reabilita a verificação de chaves estrangeiras.
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 
