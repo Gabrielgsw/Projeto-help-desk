@@ -47,7 +47,14 @@ INSERT INTO KPI (matric_tec, Sequencial, KPI_1, dsc_KPI_1, KPI_2, dsc_KPI_2) VAL
 (101, 3, 'Chamados Fechados', 'Número de chamados fechados pelo técnico', 'Taxa de Reabertura', 'Porcentagem de chamados reabertos após fechamento'),
 (104, 4, 'Produtividade Diária', 'Número de chamados resolvidos por dia', 'Qualidade do Atendimento', 'Avaliação média dos clientes'),
 (103, 5, 'Eficiência de Resolução', 'Percentual de chamados resolvidos no primeiro contato', 'Conformidade com SLAs', 'Percentual de chamados atendidos dentro do SLA'),
-(102, 6, 'Serviços concluídos', 'Número total de serviços concluídos', 'Quantidade de serviços de médio/grande porte', 'Quantidade de serviços que possuem o valor acima de 500 reais');
+(102, 6, 'Serviços concluídos', 'Número total de serviços concluídos', 'Quantidade de serviços de médio/grande porte', 'Quantidade de serviços que possuem o valor acima de 500 reais'),
+(101, 7, 'Chamados Fechados', 'Número de chamados fechados pelo técnico', 'Serviços Concluídos', 'Número de serviços finalizados pelo técnico.'),
+(102, 8, 'Chamados Fechados', 'Número de chamados fechados pelo técnico', 'Serviços Concluídos', 'Número de serviços finalizados pelo técnico.'),
+(103, 9, 'Chamados Fechados', 'Número de chamados fechados pelo técnico', 'Serviços Concluídos', 'Número de serviços finalizados pelo técnico.'),
+(104, 10, 'Chamados Fechados', 'Número de chamados fechados pelo técnico', 'Serviços Concluídos', 'Número de serviços finalizados pelo técnico.');
+-- -----------------------------------------------------
+
+
 
 -- -----------------------------------------------------
 -- População da Tabela FATURA
@@ -169,6 +176,7 @@ INSERT INTO TIPO_SERVICO (descricao) VALUES
 -- -----------------------------------------------------
 -- População da Tabela SERVICO
 -- -----------------------------------------------------
+-- DROP TABLE SERVICO
 INSERT INTO SERVICO (descricao, status, valor, cod_tipo_servico, num_serv, nivel_urgencia) VALUES
 ('Diagnóstico e reparo de conectividade de rede do cliente.', 'Concluído', 150.00, 4, 1, 'Alta'),   -- Referencia ORDEM_SERVICO.numero = 1 (cod_chamado 1)
 ('Instalação e configuração do software de gestão ERP.', 'Em Execução', 300.00, 1, 2, 'Média'),  -- Referencia ORDEM_SERVICO.numero = 2 (cod_chamado 2)
@@ -300,6 +308,7 @@ SELECT * FROM UNIDADE_SUPORTE;
 
 -- Selecionar todos os dados da tabela CLIENTE_PJ
 SELECT * FROM CLIENTE_PJ;
+-- DROP TABLE CLIENTE_PJ;
 
 -- Selecionar todos os dados da tabela SUPERVISOR
 SELECT * FROM SUPERVISOR;
@@ -324,6 +333,8 @@ SELECT * FROM ORCAMENTO;
 
 -- Selecionar todos os dados da tabela ORDEM_SERVICO
 SELECT * FROM ORDEM_SERVICO;
+SHOW CREATE TRIGGER trigger_updt_dt_devida;
+
 
 -- Selecionar todos os dados da tabela TIPO_SERVICO
 SELECT * FROM TIPO_SERVICO;
